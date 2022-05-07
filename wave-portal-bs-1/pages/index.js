@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import Image from 'next/image'
 import { useEffect, useState } from 'react';
 import styles from "../styles/Home.module.css";
 import { WAVE_CONTRACT_ABI, WAVE_CONTRACT_ADDRESS } from "../constants/index";
@@ -10,6 +11,8 @@ export default function Home() {
   * Just a state variable we use to store our user's public wallet.
   */
   const [currentAccount, setCurrentAccount] = useState("");
+  const [totalWaveCount, setTotalWaveCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -74,18 +77,21 @@ export default function Home() {
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(WAVE_CONTRACT_ADDRESS, WAVE_CONTRACT_ABI, signer);
 
-         /*
-        * Execute the actual wave from your smart contract
-        */
-         const waveTxn = await wavePortalContract.wave();
-         console.log("Mining...", waveTxn.hash);
- 
-         await waveTxn.wait();
-         console.log("Mined -- ", waveTxn.hash);
- 
+        /*
+       * Execute the actual wave from your smart contract
+       */
+        const waveTxn = await wavePortalContract.wave();
+        console.log("Mining...", waveTxn.hash);
+        setLoading(true);
+
+        await waveTxn.wait();
+        console.log("Mined -- ", waveTxn.hash);
+
 
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
+        setTotalWaveCount(count.toNumber());
+        setLoading(false);
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -112,7 +118,8 @@ export default function Home() {
             I am Zain and I write apps for mobile, web & web3, pretty cool right? Connect your Ethereum wallet and wave at me!
           </div>
 
-          <button className={styles.waveButton} onClick={wave}>
+          {loading && <div className={styles.loader}></div>}
+          <button disabled={loading || !currentAccount} className={styles.waveButton} onClick={wave}>
             Wave at Me
           </button>
 
@@ -124,6 +131,12 @@ export default function Home() {
               Connect Wallet
             </button>
           )}
+
+          <div className={styles.bio}>
+            Total Wave Count: {totalWaveCount}
+          </div>
+
+          <Image src='/my_image.jpg' height='600px' width='600px' />
 
         </div>
 
