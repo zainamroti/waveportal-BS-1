@@ -11,20 +11,21 @@ async function main() {
   const waveContract = await waveContractFactory.deploy();
   await waveContract.deployed();
   console.log("Contract deployed to:", waveContract.address);
-  console.log("Contract deployed by:", owner.address);
-
+  
   let waveCount;
   waveCount = await waveContract.getTotalWaves();
+  console.log(waveCount.toNumber());
+  /**
+     * Let's send a few waves!
+     */
+  let waveTxn = await waveContract.wave("A message!");
+  await waveTxn.wait(); // Wait for the transaction to be mined
 
-  let waveTxn = await waveContract.wave();
-  await waveTxn.wait();
+  waveTxn = await waveContract.connect(randomPerson).wave("Another message!");
+  await waveTxn.wait(); // Wait for the transaction to be mined
 
-  waveCount = await waveContract.getTotalWaves();
-
-  waveTxn = await waveContract.connect(randomPerson).wave();
-  await waveTxn.wait();
-
-  waveCount = await waveContract.getTotalWaves();
+  let allWaves = await waveContract.getAllWaves();
+  console.log(allWaves);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

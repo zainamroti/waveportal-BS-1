@@ -11,6 +11,7 @@ export default function Home() {
   * Just a state variable we use to store our user's public wallet.
   */
   const [currentAccount, setCurrentAccount] = useState("");
+  const [allWaves, setAllWaves] = useState([]);
   const [totalWaveCount, setTotalWaveCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -34,6 +35,7 @@ export default function Home() {
         const account = accounts[0];
         console.log("Found an authorized account:", account);
         setCurrentAccount(account)
+        getAllWaves();
       } else {
         console.log("No authorized account found")
       }
@@ -60,6 +62,47 @@ export default function Home() {
     }
   }
 
+  /*
+   * Create a method that gets all waves from your contract
+   */
+  const getAllWaves = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(WAVE_CONTRACT_ADDRESS, WAVE_CONTRACT_ABI, signer);
+
+        /*
+         * Call the getAllWaves method from your Smart Contract
+         */
+        const waves = await wavePortalContract.getAllWaves();
+
+
+        /*
+         * We only need address, timestamp, and message in our UI so let's
+         * pick those out
+         */
+        let wavesCleaned = [];
+        waves.forEach(wave => {
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp * 1000),
+            message: wave.message
+          });
+        });
+
+        /*
+         * Store our data in React State
+         */
+        setAllWaves(wavesCleaned);
+      } else {
+        console.log("Ethereum object doesn't exist!")
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   /*
   * This runs our function when the page loads.
@@ -80,7 +123,7 @@ export default function Home() {
         /*
        * Execute the actual wave from your smart contract
        */
-        const waveTxn = await wavePortalContract.wave();
+        const waveTxn = await wavePortalContract.wave("ZAIN'S MSG");
         console.log("Mining...", waveTxn.hash);
         setLoading(true);
 
@@ -137,6 +180,15 @@ export default function Home() {
           </div>
 
           <Image src='/my_image.jpg' height='600px' width='600px' />
+
+          {allWaves.map((wave, index) => {
+            return (
+              <div key={index} style={{ backgroundColor: "OldLace", marginTop: "16px", padding: "8px" }}>
+                <div>Address: {wave.address}</div>
+                <div>Time: {wave.timestamp.toString()}</div>
+                <div>Message: {wave.message}</div>
+              </div>)
+          })}
 
         </div>
 
