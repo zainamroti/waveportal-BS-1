@@ -113,6 +113,25 @@ export const WAVE_CONTRACT_ABI = [
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "lastWavedAt",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "string",
         "name": "_message",
         "type": "string"
@@ -124,4 +143,4 @@ export const WAVE_CONTRACT_ABI = [
     "type": "function"
   }
 ];
-export const WAVE_CONTRACT_ADDRESS = "0x6173e5d96De276955C0c9253fd17af0344b686FB";
+export const WAVE_CONTRACT_ADDRESS = "0x2a6181b8E09e929Cb3b09CAf35767a32A23946E2";

@@ -151,6 +151,9 @@ export default function Home() {
       }
     } catch (error) {
       console.log(error);
+      setLoading(false);
+      alert(`Error TRX Failed: ${error.message}`);
+
     }
   }
   return (
