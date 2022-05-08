@@ -16,6 +16,15 @@
   margin-bottom: 65vh;
 }
 
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: small;
+  margin-block: 8px;
+}
+
 .header {
   text-align: center;
   font-size: 32px;

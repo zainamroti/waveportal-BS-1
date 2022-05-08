@@ -14,6 +14,7 @@ export default function Home() {
   const [allWaves, setAllWaves] = useState([]);
   const [totalWaveCount, setTotalWaveCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [waveMessage, setWaveMessage] = useState("");
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -35,7 +36,7 @@ export default function Home() {
         const account = accounts[0];
         console.log("Found an authorized account:", account);
         setCurrentAccount(account)
-        getAllWaves();
+        await getAllWaves();
       } else {
         console.log("No authorized account found")
       }
@@ -96,12 +97,18 @@ export default function Home() {
          * Store our data in React State
          */
         setAllWaves(wavesCleaned);
+        setTotalWaveCount(wavesCleaned.length);
       } else {
         console.log("Ethereum object doesn't exist!")
       }
     } catch (error) {
       console.log(error);
     }
+  }
+
+  const handleWaveMsgChange = (event) => {
+    console.log(event);
+    setWaveMessage(event.target.value);
   }
 
   /*
@@ -111,8 +118,9 @@ export default function Home() {
     checkIfWalletIsConnected();
   }, [])
 
-  const wave = async () => {
+  const wave = async (event) => {
     try {
+      event.preventDefault();
       const { ethereum } = window;
 
       if (ethereum) {
@@ -123,9 +131,10 @@ export default function Home() {
         /*
        * Execute the actual wave from your smart contract
        */
-        const waveTxn = await wavePortalContract.wave("ZAIN'S MSG");
+        const waveTxn = await wavePortalContract.wave(waveMessage);
         console.log("Mining...", waveTxn.hash);
         setLoading(true);
+        setWaveMessage("");
 
         await waveTxn.wait();
         console.log("Mined -- ", waveTxn.hash);
@@ -134,7 +143,9 @@ export default function Home() {
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
         setTotalWaveCount(count.toNumber());
+        await getAllWaves();
         setLoading(false);
+
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -162,9 +173,19 @@ export default function Home() {
           </div>
 
           {loading && <div className={styles.loader}></div>}
-          <button disabled={loading || !currentAccount} className={styles.waveButton} onClick={wave}>
-            Wave at Me
-          </button>
+
+          <form onSubmit={wave} className={styles.form}>
+            <label>
+              Enter Wave Message: &nbsp;
+              <input disabled={loading} type="text" value={waveMessage} onChange={handleWaveMsgChange} />
+            </label>
+            {/* <input type="submit" value="Submit" /> */}
+            <button type="submit" value="Submit" disabled={loading || !currentAccount || waveMessage.length === 0} className={styles.waveButton}>
+              Wave at Me
+            </button>
+          </form>
+
+
 
           {/*
         * If there is no currentAccount render this button
@@ -179,7 +200,7 @@ export default function Home() {
             Total Wave Count: {totalWaveCount}
           </div>
 
-          <Image src='/my_image.jpg' height='600px' width='600px' />
+          <Image src='/my_image.jpg' height='200px' width='200px' />
 
           {allWaves.map((wave, index) => {
             return (
