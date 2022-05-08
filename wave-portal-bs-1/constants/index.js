@@ -1,7 +1,7 @@
 export const WAVE_CONTRACT_ABI = [
   {
     "inputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "constructor"
   },
   {
@@ -124,5 +124,4 @@ export const WAVE_CONTRACT_ABI = [
     "type": "function"
   }
 ];
-export const WAVE_CONTRACT_ADDRESS = "0xE8F393E951435927a24D9b9811a9319e5c4CC681";
-  
+export const WAVE_CONTRACT_ADDRESS = "0x6173e5d96De276955C0c9253fd17af0344b686FB";
